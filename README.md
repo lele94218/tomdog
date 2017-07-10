@@ -17,7 +17,8 @@
                         '---'          '---'                      `---`      
 ```
 
-![such_dog](http://fanaru.com/doge/image/218965-doge-doge.jpg)
+
+<img src="http://fanaru.com/doge/image/218965-doge-doge.jpg" width="450">
 
 References
 1. [How tomcat works](https://www.amazon.com/How-Tomcat-Works-Budi-Kurniawan/dp/097521280X)

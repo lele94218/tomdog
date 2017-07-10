@@ -99,34 +99,36 @@ public class HttpRequest implements HttpServletRequest {
         this.input = input;
     }
 
-//    public void parse() {
-//        StringBuffer request = new StringBuffer(2048);
-//        int i;
-//        byte[] buffer = new byte[2048];
-//        try {
-//            i = input.read(buffer);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            i = -1;
-//        }
-//        for (int j = 0; j < i; ++j) {
-//            request.append((char) buffer[j]);
-//        }
-//        System.out.println(request.toString());
-//        requestURI = parseUri(request.toString());
-//    }
+    @Deprecated
+    public void parse() {
+        StringBuffer request = new StringBuffer(2048);
+        int i;
+        byte[] buffer = new byte[2048];
+        try {
+            i = input.read(buffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            i = -1;
+        }
+        for (int j = 0; j < i; ++j) {
+            request.append((char) buffer[j]);
+        }
+        System.out.println(request.toString());
+        requestURI = parseUri(request.toString());
+    }
 
-//    private String parseUri(String s) {
-//        int index1, index2;
-//        index1 = s.indexOf(' ');
-//        if (index1 != -1) {
-//            index2 = s.indexOf(' ', index1 + 1);
-//            if (index2 > index1) {
-//                return s.substring(index1 + 1, index2);
-//            }
-//        }
-//        return null;
-//    }
+    @Deprecated
+    private String parseUri(String s) {
+        int index1, index2;
+        index1 = s.indexOf(' ');
+        if (index1 != -1) {
+            index2 = s.indexOf(' ', index1 + 1);
+            if (index2 > index1) {
+                return s.substring(index1 + 1, index2);
+            }
+        }
+        return null;
+    }
 
     public String getUri() {
         return requestURI;
@@ -471,6 +473,7 @@ public class HttpRequest implements HttpServletRequest {
             results = new ParameterMap();
 
         results.setLocked(false);
+
         String encoding = getCharacterEncoding();
         if (encoding == null)
             encoding = "ISO-8859-1";

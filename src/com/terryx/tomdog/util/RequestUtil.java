@@ -118,6 +118,7 @@ public final class RequestUtil {
                         value = new String(data, 0, ox, encoding);
                         if (key != null) {
                             putMapEntry(map, key, value);
+                            key = null;
                         }
                         ox = 0;
                         break;

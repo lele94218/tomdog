@@ -188,7 +188,7 @@ public class HttpResponse implements HttpServletResponse {
     protected void sendHeaders() throws IOException {
         if (isCommitted())
             return;
-        System.out.println("sending header...." + getProtocol());
+//        System.out.println("sending header...." + getProtocol());
 
         // Prepare a suitable output writer
         OutputStreamWriter osr = null;
