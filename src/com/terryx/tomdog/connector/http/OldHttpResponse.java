@@ -1,8 +1,7 @@
 package com.terryx.tomdog.connector.http;
 
 import com.terryx.tomdog.Constants;
-import com.terryx.tomdog.connector.ResponseStream;
-import com.terryx.tomdog.connector.ResponseWriter;
+import com.terryx.tomdog.util.RequestUtil;
 import org.apache.catalina.util.CookieTools;
 
 import javax.servlet.ServletOutputStream;
@@ -16,10 +15,11 @@ import java.util.Locale;
 
 /**
  * @author taoranxue on 6/27/17 4:38 PM.
+ * @deprecated
  */
-public class HttpResponse implements HttpServletResponse {
+public class OldHttpResponse implements HttpServletResponse {
     private static final int BUFFER_SIZE = 1024;
-    private HttpRequest request;
+    private OldHttpRequest request;
     private OutputStream output;
     private PrintWriter writer;
     protected byte[] buffer = new byte[BUFFER_SIZE];
@@ -68,7 +68,7 @@ public class HttpResponse implements HttpServletResponse {
      */
     protected ArrayList cookies = new ArrayList();
 
-    public HttpResponse(OutputStream output) {
+    public OldHttpResponse(OutputStream output) {
         this.output = output;
     }
 
@@ -208,6 +208,7 @@ public class HttpResponse implements HttpServletResponse {
         }
         outputWriter.print("\r\n");
         // Send the content-length and content-type headers (if any)
+        System.out.println(getContentType());
         if (getContentType() != null) {
             outputWriter.print("Content-Type: " + getContentType() + "\r\n");
         }
@@ -269,7 +270,7 @@ public class HttpResponse implements HttpServletResponse {
         committed = true;
     }
 
-    public void setRequest(HttpRequest request) {
+    public void setRequest(OldHttpRequest request) {
         this.request = request;
     }
 
@@ -404,11 +405,12 @@ public class HttpResponse implements HttpServletResponse {
     public PrintWriter getWriter() throws IOException {
 //        System.out.println("get writer: " + output.toString());
 //        writer = new PrintWriter(output, true);
-        ResponseStream newStream = new ResponseStream(this);
-        newStream.setCommit(false);
-        OutputStreamWriter osr = new OutputStreamWriter(newStream, getCharacterEncoding());
-        writer = new ResponseWriter(osr);
-        return writer;
+//        ResponseStream newStream = new ResponseStream(this);
+//        newStream.setCommit(false);
+//        OutputStreamWriter osr = new OutputStreamWriter(newStream, getCharacterEncoding());
+//        writer = new ResponseWriter(osr);
+//        return writer;
+        return null;
     }
 
     @Override
@@ -420,8 +422,20 @@ public class HttpResponse implements HttpServletResponse {
     }
 
     @Override
-    public void setContentType(String s) {
+    public void setContentType(String type) {
+        if (isCommitted())
+            return;
 
+
+        this.contentType = type;
+        if (type.indexOf(';') >= 0) {
+            encoding = RequestUtil.parseCharacterEncoding(type);
+            if (encoding == null)
+                encoding = "ISO-8859-1";
+        } else {
+            if (encoding != null)
+                this.contentType = type + ";charset=" + encoding;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.terryx.tomdog.connector;
 
-import com.terryx.tomdog.connector.http.HttpResponse;
+
+import com.terryx.tomdog.Response;
 
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class ResponseStream extends ServletOutputStream {
      *
      * @param response The associated response
      */
-    public ResponseStream(HttpResponse response) {
+    public ResponseStream(Response response) {
 
         super();
         closed = false;
@@ -61,7 +62,7 @@ public class ResponseStream extends ServletOutputStream {
     /**
      * The Response with which this input stream is associated.
      */
-    protected HttpResponse response = null;
+    protected Response response = null;
 
 
     /**
@@ -105,7 +106,7 @@ public class ResponseStream extends ServletOutputStream {
     public void close() throws IOException {
         if (closed)
             throw new IOException("responseStream.close.closed");
-        response.flushBuffer();
+        ((ResponseBase)response).flushBuffer();
         closed = true;
     }
 
@@ -118,8 +119,8 @@ public class ResponseStream extends ServletOutputStream {
         if (closed)
             throw new IOException("responseStream.flush.closed");
         if (commit) {
-            // When ResponseWriter call flush(). Finally, HttpResponse will flush its buffer called by ResponseStream.
-            response.flushBuffer();
+            // When ResponseWriter call flush(). Finally, OldHttpResponse will flush its buffer called by ResponseStream.
+            ((ResponseBase)response).flushBuffer();
         }
 
     }
@@ -139,7 +140,7 @@ public class ResponseStream extends ServletOutputStream {
         if ((length > 0) && (count >= length))
             throw new IOException("responseStream.write.count");
 
-        response.write(b);
+        ((ResponseBase)response).write(b);
         count++;
 
     }
@@ -158,7 +159,7 @@ public class ResponseStream extends ServletOutputStream {
         int actual = len;
         if ((length > 0) && ((count + len) >= length))
             actual = length - count;
-        response.write(b, off, actual);
+        ((ResponseBase)response).write(b, off, actual);
         count += actual;
         if (actual < len)
             throw new IOException("responseStream.write.count");

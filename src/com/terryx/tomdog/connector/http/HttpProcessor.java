@@ -22,8 +22,8 @@ import java.net.Socket;
  */
 public class HttpProcessor {
     private HttpConnector httpConnector;
-    private HttpRequest request;
-    private HttpResponse response;
+    private HttpRequestImpl request;
+    private HttpResponseImpl response;
     private HttpRequestLine requestLine = new HttpRequestLine();
 
     protected StringManager sm = StringManager.getManager("com.terryx.tomdog.connector.http");
@@ -40,8 +40,10 @@ public class HttpProcessor {
             input = new SocketInputStream(socket.getInputStream(), 2048);
             output = socket.getOutputStream();
 
-            request = new HttpRequest(input);
-            response = new HttpResponse(output);
+            request = new HttpRequestImpl();
+            request.setStream(input);
+            response = new HttpResponseImpl();
+            response.setStream(output);
             response.setRequest(request);
             response.setHeader("Server", "Tomdog Server Container");
 

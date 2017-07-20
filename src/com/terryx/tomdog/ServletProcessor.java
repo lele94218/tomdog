@@ -1,9 +1,9 @@
 package com.terryx.tomdog;
 
-import com.terryx.tomdog.connector.http.HttpRequest;
-import com.terryx.tomdog.connector.http.HttpRequestFacade;
-import com.terryx.tomdog.connector.http.HttpResponse;
-import com.terryx.tomdog.connector.http.HttpResponseFacade;
+import com.terryx.tomdog.connector.HttpRequestFacade;
+import com.terryx.tomdog.connector.HttpResponseFacade;
+import com.terryx.tomdog.connector.http.HttpRequestImpl;
+import com.terryx.tomdog.connector.http.HttpResponseImpl;
 
 import javax.servlet.Servlet;
 import java.io.File;
@@ -15,8 +15,8 @@ import java.net.URLStreamHandler;
  * @author taoranxue on 6/27/17 8:09 PM.
  */
 public class ServletProcessor {
-    public void process(HttpRequest httpRequest, HttpResponse httpResponse) {
-        String uri = httpRequest.getUri();
+    public void process(HttpRequestImpl httpRequest, HttpResponseImpl httpResponse) {
+        String uri = httpRequest.getRequestURI();
         String servletName = uri.substring(uri.lastIndexOf('/') + 1);
         URLClassLoader loader = null;
         try {

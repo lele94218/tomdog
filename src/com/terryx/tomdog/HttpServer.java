@@ -1,7 +1,7 @@
 package com.terryx.tomdog;
 
-import com.terryx.tomdog.connector.http.HttpRequest;
-import com.terryx.tomdog.connector.http.HttpResponse;
+import com.terryx.tomdog.connector.http.OldHttpRequest;
+import com.terryx.tomdog.connector.http.OldHttpResponse;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,20 +36,20 @@ public class HttpServer {
                 input = socket.getInputStream();
                 output = socket.getOutputStream();
 
-                HttpRequest httpRequest = new HttpRequest(input);
+                OldHttpRequest httpRequest = new OldHttpRequest(input);
                 httpRequest.parse();
 
-                HttpResponse httpResponse = new HttpResponse(output);
+                OldHttpResponse httpResponse = new OldHttpResponse(output);
                 httpResponse.setRequest(httpRequest);
 
 
                 /* Check if it is a servlet or static resources */
                 if (httpRequest.getUri().startsWith("/servlet/")) {
                     ServletProcessor processor = new ServletProcessor();
-                    processor.process(httpRequest, httpResponse);
+//                    processor.process(httpRequest, httpResponse);
                 } else {
                     StaticResourceProcessor processor = new StaticResourceProcessor();
-                    processor.process(httpRequest, httpResponse);
+//                    processor.process(httpRequest, httpResponse);
                 }
 //                httpResponse.sendStaticResource();
 

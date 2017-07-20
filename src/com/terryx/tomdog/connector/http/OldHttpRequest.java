@@ -1,9 +1,9 @@
 package com.terryx.tomdog.connector.http;
 
 
+import com.terryx.tomdog.util.Enumerator;
 import com.terryx.tomdog.util.ParameterMap;
 import com.terryx.tomdog.util.RequestUtil;
-import org.apache.catalina.util.Enumerator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
@@ -19,8 +19,9 @@ import java.util.*;
 
 /**
  * @author taoranxue on 6/27/17 4:35 PM.
+ * @deprecated
  */
-public class HttpRequest implements HttpServletRequest {
+public class OldHttpRequest implements HttpServletRequest {
     private InputStream input;
 
 
@@ -95,7 +96,7 @@ public class HttpRequest implements HttpServletRequest {
      */
     protected ParameterMap parameters = null;
 
-    public HttpRequest(InputStream input) {
+    public OldHttpRequest(InputStream input) {
         this.input = input;
     }
 
