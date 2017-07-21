@@ -20,16 +20,56 @@ import java.net.Socket;
  *
  * @author taoranxue on 6/28/17 4:43 PM.
  */
-public class HttpProcessor {
-    private HttpConnector httpConnector;
+public class HttpProcessor implements Runnable {
+    private HttpConnector connector;
     private HttpRequestImpl request;
     private HttpResponseImpl response;
     private HttpRequestLine requestLine = new HttpRequestLine();
 
+    /**
+     * Is there a new socket available?
+     */
+    private boolean available = false;
+
+    /**
+     * The socket we are currently processing a request for.  This object
+     * is used for inter-thread communication only.
+     */
+    private Socket socket = null;
+
+    /**
+     * The shutdown signal to our background thread
+     */
+    private boolean stopped = false;
+
+    /**
+     * The name to register for the background thread.
+     */
+    private String threadName = null;
+
+    /**
+     * The background thread.
+     */
+    private Thread thread = null;
+
+    /**
+     * The identifier of this processor, unique per connector.
+     */
+    private int id = 0;
+
     protected StringManager sm = StringManager.getManager("com.terryx.tomdog.connector.http");
 
-    public HttpProcessor(HttpConnector httpConnector) {
-        this.httpConnector = httpConnector;
+    public HttpProcessor(HttpConnector connector, int id) {
+        super();
+        this.connector = connector;
+//        this.debug = connector.getDebug();
+        this.id = id;
+//        this.proxyName = connector.getProxyName();
+//        this.proxyPort = connector.getProxyPort();
+        this.request = (HttpRequestImpl) connector.createRequest();
+        this.response = (HttpResponseImpl) connector.createResponse();
+//        this.serverPort = connector.getPort();
+        this.threadName = "HttpProcessor[" + connector.getPort() + "][" + id + "]";
     }
 
     public void process(Socket socket) {
@@ -284,6 +324,110 @@ public class HttpProcessor {
                 request.setContentType(name);
             }
         }
+
+    }
+
+    /**
+     * The background thread that listens for incoming TCP/IP connections and
+     * hands them off to an appropriate processor.
+     */
+    @Override
+    public void run() {
+        // Process requests until we receive a shutdown signal
+        while (!stopped) {
+
+            // Wait for the next socket to be assigned
+            Socket socket = await();
+            if (socket == null)
+                continue;
+
+            // Process the request from this socket
+            try {
+                process(socket);
+            } catch (Throwable t) {
+//                log("process.invoke", t);
+            }
+
+            // Finish up this request
+            connector.recycle(this);
+
+        }
+
+        // Tell threadStop() we have shut ourselves down successfully
+//        synchronized (threadSync) {
+//            threadSync.notifyAll();
+//        }
+    }
+
+    /**
+     * Process an incoming TCP/IP connection on the specified socket.  Any
+     * exception that occurs during processing must be logged and swallowed.
+     * <b>NOTE</b>:  This method is called from our Connector's thread.  We
+     * must assign it to our own thread so that multiple simultaneous
+     * requests can be handled.
+     *
+     * @param socket TCP socket to process
+     */
+    synchronized void assign(Socket socket) {
+
+        // Wait for the Processor to get the previous Socket
+        while (available) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(e.toString());
+            }
+        }
+
+        // Store the newly available Socket and notify our thread
+        this.socket = socket;
+        available = true;
+        notifyAll();
+
+//        if ((debug >= 1) && (socket != null))
+//            log(" An incoming request is being assigned");
+    }
+
+    /**
+     * Start the background processing thread.
+     */
+    void threadStart() {
+
+//        log(sm.getString("httpProcessor.starting"));
+
+        thread = new Thread(this, threadName);
+        thread.setDaemon(true);
+        thread.start();
+
+//        if (debug >= 1)
+//            log(" Background thread has been started");
+
+    }
+
+    /**
+     * Await a newly assigned Socket from our Connector, or <code>null</code>
+     * if we are supposed to shut down.
+     */
+    private synchronized Socket await() {
+
+        // Wait for the Connector to provide a new Socket
+        while (!available) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(e.toString());
+            }
+        }
+
+        // Notify the Connector that we have received this Socket
+        Socket socket = this.socket;
+        available = false;
+        notifyAll();
+
+//        if ((debug >= 1) && (socket != null))
+//            log("  The incoming request has been awaited");
+
+        return (socket);
 
     }
 }

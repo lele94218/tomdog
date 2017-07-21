@@ -10,7 +10,7 @@ import java.util.Enumeration;
 /**
  * @author taoranxue on 7/9/17 11:06 PM.
  */
-public class ModernServlet extends HttpServlet{
+public class ModernServlet extends HttpServlet {
 
     public void init(ServletConfig config) {
         System.out.println("MordernServlet -- init");
@@ -18,7 +18,11 @@ public class ModernServlet extends HttpServlet{
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");
