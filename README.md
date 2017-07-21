@@ -14,7 +14,7 @@ TOMDOG -- a Lightweight Java Web Container
                                  __/ |
                                 |___/ 
 ____________________________ Version 0.1.1 __                              
-<pre>
+</pre>
 
 Update log
 ----
