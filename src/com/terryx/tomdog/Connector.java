@@ -59,20 +59,20 @@ public interface Connector {
     // ------------------------------------------------------------- Properties
 
 
-//    /**
-//     * Return the Container used for processing requests received by this
-//     * Connector.
-//     */
-//    public Container getContainer();
-//
-//
-//    /**
-//     * Set the Container used for processing requests received by this
-//     * Connector.
-//     *
-//     * @param container The new Container to use
-//     */
-//    public void setContainer(Container container);
+    /**
+     * Return the Container used for processing requests received by this
+     * Connector.
+     */
+    public Container getContainer();
+
+
+    /**
+     * Set the Container used for processing requests received by this
+     * Connector.
+     *
+     * @param container The new Container to use
+     */
+    public void setContainer(Container container);
 
 
     /**

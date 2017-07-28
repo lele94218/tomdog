@@ -6,6 +6,7 @@ import com.terryx.tomdog.connector.http.HttpResponseImpl;
 
 /**
  * @author taoranxue on 6/27/17 8:09 PM.
+ * @deprecated
  */
 public class StaticResourceProcessor {
     public void process(HttpRequestImpl request, HttpResponseImpl response) {

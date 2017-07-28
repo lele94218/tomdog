@@ -13,6 +13,7 @@ import java.net.URLStreamHandler;
 
 /**
  * @author taoranxue on 6/27/17 8:09 PM.
+ * @deprecated
  */
 public class ServletProcessor {
     public void process(HttpRequestImpl httpRequest, HttpResponseImpl httpResponse) {

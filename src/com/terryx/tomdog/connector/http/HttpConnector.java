@@ -1,6 +1,7 @@
 package com.terryx.tomdog.connector.http;
 
 import com.terryx.tomdog.Connector;
+import com.terryx.tomdog.Container;
 import com.terryx.tomdog.Request;
 import com.terryx.tomdog.Response;
 import com.terryx.tomdog.net.DefaultServerSocketFactory;
@@ -69,6 +70,11 @@ public final class HttpConnector implements Connector, Runnable {
      * The set of processors that have ever been created.
      */
     private Vector created = new Vector();
+
+    /**
+     * The Container used for processing requests received by this Connector.
+     */
+    protected Container container = null;
 
     private boolean shutdown = false;
     private String scheme = "http";
@@ -176,6 +182,16 @@ public final class HttpConnector implements Connector, Runnable {
         }
 
         throw new Exception("Not implement");
+    }
+
+    @Override
+    public Container getContainer() {
+        return container;
+    }
+
+    @Override
+    public void setContainer(Container container) {
+        this.container = container;
     }
 
     @Override
