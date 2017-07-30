@@ -1,6 +1,7 @@
 package com.terryx.tomdog.connector;
 
 
+import com.terryx.tomdog.Connector;
 import com.terryx.tomdog.Request;
 import com.terryx.tomdog.Response;
 import com.terryx.tomdog.util.Enumerator;
@@ -49,10 +50,10 @@ public abstract class RequestBase
     protected String characterEncoding = null;
 
 
-//    /**
-//     * The Connector through which this Request was received.
-//     */
-//    protected Connector connector = null;
+    /**
+     * The Connector through which this Request was received.
+     */
+    protected Connector connector = null;
 
 
     /**
@@ -216,26 +217,26 @@ public abstract class RequestBase
     }
 
 
-//    /**
-//     * Return the Connector through which this Request was received.
-//     */
-//    public Connector getConnector() {
-//
-//        return (this.connector);
-//
-//    }
+    /**
+     * Return the Connector through which this Request was received.
+     */
+    public Connector getConnector() {
+
+        return (this.connector);
+
+    }
 
 
-//    /**
-//     * Set the Connector through which this Request was received.
-//     *
-//     * @param connector The new connector
-//     */
-//    public void setConnector(Connector connector) {
-//
-//        this.connector = connector;
-//
-//    }
+    /**
+     * Set the Connector through which this Request was received.
+     *
+     * @param connector The new connector
+     */
+    public void setConnector(Connector connector) {
+
+        this.connector = connector;
+
+    }
 
 
 //    /**

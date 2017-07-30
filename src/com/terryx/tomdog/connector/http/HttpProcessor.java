@@ -7,6 +7,7 @@ import com.terryx.tomdog.util.StringManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -25,6 +26,14 @@ public class HttpProcessor implements Runnable {
     private HttpRequestImpl request;
     private HttpResponseImpl response;
     private HttpRequestLine requestLine = new HttpRequestLine();
+
+
+    /**
+     * Server information string for this server.
+     */
+    private static final String SERVER_INFO =
+//            ServerInfo.getServerInfo() + " (HTTP/1.1 Connector)";
+            "TerryX Tomdog/0.1.1 (HTTP/1.1 Connector)";
 
     /**
      * Is there a new socket available?
@@ -57,6 +66,26 @@ public class HttpProcessor implements Runnable {
      */
     private int id = 0;
 
+    /**
+     * Keep alive indicator.
+     */
+    private boolean keepAlive = false;
+
+
+    /**
+     * HTTP/1.1 client.
+     */
+    private boolean http11 = true;
+
+
+    /**
+     * True if the client has asked to recieve a request acknoledgement. If so
+     * the server will send a preliminary 100 Continue response just after it
+     * has successfully parsed the request headers, and before starting
+     * reading the request entity body.
+     */
+    private boolean sendAck = false;
+
     protected StringManager sm = StringManager.getManager("com.terryx.tomdog.connector.http");
 
     public HttpProcessor(HttpConnector connector, int id) {
@@ -72,38 +101,124 @@ public class HttpProcessor implements Runnable {
         this.threadName = "HttpProcessor[" + connector.getPort() + "][" + id + "]";
     }
 
+
+    /**
+     * Process an incoming HTTP request on the Socket that has been assigned
+     * to this Processor.  Any exceptions that occur during processing must be
+     * swallowed and dealt with.
+     *
+     * @param socket The socket on which we are connected to the client
+     */
     public void process(Socket socket) {
+        boolean ok = true;
+        boolean finishResponse = true;
         SocketInputStream input = null;
         OutputStream output = null;
 
+        // Construct and initialize the objects we will need
         try {
-            input = new SocketInputStream(socket.getInputStream(), 2048);
-            output = socket.getOutputStream();
+            input = new SocketInputStream(socket.getInputStream(),
+                    connector.getBufferSize());
+        } catch (Exception e) {
+//            log("process.create", e);
+            ok = false;
+        }
 
-            request = new HttpRequestImpl();
-            request.setStream(input);
-            response = new HttpResponseImpl();
-            response.setStream(output);
-            response.setRequest(request);
-            response.setHeader("Server", "Tomdog Server Container");
+        keepAlive = true;
 
-            parseRequest(input, output);
-            parseHeaders(input);
+        while (!stopped && ok && keepAlive) {
 
+            finishResponse = true;
 
-            if (request.getRequestURI().startsWith("/servlet/")) {
-                ServletProcessor processor = new ServletProcessor();
-                processor.process(request, response);
-            } else {
-                StaticResourceProcessor processor = new StaticResourceProcessor();
-                processor.process(request, response);
+            try {
+                request.setStream(input);
+                request.setResponse(response);
+                output = socket.getOutputStream();
+                response.setStream(output);
+                response.setRequest(request);
+                ((HttpServletResponse) response.getResponse()).setHeader
+                        ("Server", SERVER_INFO);
+            } catch (Exception e) {
+//                log("process.create", e);
+                ok = false;
             }
 
-            socket.close();
+            // Parse the incoming request
+            try {
+                if (ok) {
+//                    parseConnection(socket);
+                    parseRequest(input, output);
+                    if (!request.getRequest().getProtocol()
+                            .startsWith("HTTP/0"))
+                        parseHeaders(input);
+                    if (http11) {
+                        // Sending a request acknowledge back to the client if
+                        // requested.
+//                        ackRequest(output);
+                        // If the protocol is HTTP/1.1, chunking is allowed.
+//                        if (connector.isChunkingAllowed())
+//                            response.setAllowChunking(true);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            // Ask our Container to process this request
+            try {
+//                ((HttpServletResponse) response).setHeader
+//                        ("Date", FastHttpDateFormat.getCurrentDate());
+                if (ok) {
+                    connector.getContainer().invoke(request, response);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
+//                shutdownInput(input);
+                socket.close();
+            } catch (IOException e) {
+                ;
+            } catch (Throwable e) {
+//                log("process.invoke", e);
+            }
+            socket = null;
+
+//            System.out.println("Ok---");
         }
+
+
+//        SocketInputStream input = null;
+//        OutputStream output = null;
+//
+//        try {
+//            input = new SocketInputStream(socket.getInputStream(), 2048);
+//            output = socket.getOutputStream();
+//
+//            request.setStream(input);
+//            response.setStream(output);
+//            response.setRequest(request);
+//            response.setHeader("Server", "Tomdog Server Container");
+//
+//            parseRequest(input, output);
+//            parseHeaders(input);
+//
+//
+//            if (request.getRequestURI().startsWith("/servlet/")) {
+//                ServletProcessor processor = new ServletProcessor();
+//                processor.process(request, response);
+//            } else {
+//                StaticResourceProcessor processor = new StaticResourceProcessor();
+//                processor.process(request, response);
+//            }
+//
+//            socket.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -120,6 +235,22 @@ public class HttpProcessor implements Runnable {
         String method = new String(requestLine.method, 0, requestLine.methodEnd);
         String uri = null;
         String protocol = new String(requestLine.protocol, 0, requestLine.protocolEnd);
+
+        if (protocol.length() == 0)
+            protocol = "HTTP/0.9";
+
+        // Now check if the connection should be kept alive after parsing the
+        // request.
+        if ( protocol.equals("HTTP/1.1") ) {
+            http11 = true;
+            sendAck = false;
+        } else {
+            http11 = false;
+            sendAck = false;
+            // For HTTP/1.0, connection are not persistent by default,
+            // unless specified with a Connection: Keep-Alive header.
+            keepAlive = false;
+        }
 
         if (method.length() < 1) {
             throw new ServletException("Missing HTTP request method");

@@ -1,5 +1,6 @@
 package com.terryx.tomdog.connector;
 
+import com.terryx.tomdog.Connector;
 import com.terryx.tomdog.Request;
 import com.terryx.tomdog.Response;
 import com.terryx.tomdog.util.RequestUtil;
@@ -55,11 +56,11 @@ public abstract class ResponseBase
      */
     protected boolean committed = false;
 
-//
-//    /**
-//     * The Connector through which this Response is returned.
-//     */
-//    protected Connector connector = null;
+
+    /**
+     * The Connector through which this Response is returned.
+     */
+    protected Connector connector = null;
 
 
     /**
@@ -185,26 +186,26 @@ public abstract class ResponseBase
     }
 
 
-//    /**
-//     * Return the Connector through which this Response will be transmitted.
-//     */
-//    public Connector getConnector() {
-//
-//        return (this.connector);
-//
-//    }
+    /**
+     * Return the Connector through which this Response will be transmitted.
+     */
+    public Connector getConnector() {
+
+        return (this.connector);
+
+    }
 
 
-//    /**
-//     * Set the Connector through which this Response will be transmitted.
-//     *
-//     * @param connector The new connector
-//     */
-//    public void setConnector(Connector connector) {
-//
-//        this.connector = connector;
-//
-//    }
+    /**
+     * Set the Connector through which this Response will be transmitted.
+     *
+     * @param connector The new connector
+     */
+    public void setConnector(Connector connector) {
+
+        this.connector = connector;
+
+    }
 
 
     /**

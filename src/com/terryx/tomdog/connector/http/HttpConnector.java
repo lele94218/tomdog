@@ -76,6 +76,11 @@ public final class HttpConnector implements Connector, Runnable {
      */
     protected Container container = null;
 
+    /**
+     * The input buffer size we should create on input streams.
+     */
+    private int bufferSize = 2048;
+
     private boolean shutdown = false;
     private String scheme = "http";
 
@@ -100,12 +105,16 @@ public final class HttpConnector implements Connector, Runnable {
 
     @Override
     public Request createRequest() {
-        return null;
+        HttpRequestImpl request = new HttpRequestImpl();
+        request.setConnector(this);
+        return (request);
     }
 
     @Override
     public Response createResponse() {
-        return null;
+        HttpResponseImpl response = new HttpResponseImpl();
+        response.setConnector(this);
+        return (response);
     }
 
 
@@ -255,6 +264,15 @@ public final class HttpConnector implements Connector, Runnable {
     public void setPort(int port) {
 
         this.port = port;
+
+    }
+
+    /**
+     * Return the input buffer size for this Connector.
+     */
+    public int getBufferSize() {
+
+        return (this.bufferSize);
 
     }
 
