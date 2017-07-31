@@ -7,6 +7,7 @@ import com.terryx.tomdog.util.RequestUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -170,6 +171,16 @@ public class HttpRequestBase extends RequestBase implements HttpRequest, HttpSer
      */
     protected Principal userPrincipal = null;
 
+
+    /**
+     * Return the <code>ServletRequest</code> for which this object
+     * is the facade.  This method must be implemented by a subclass.
+     */
+    public ServletRequest getRequest() {
+
+        return (facade);
+
+    }
 
     @Override
     public void addCookie(Cookie cookie) {

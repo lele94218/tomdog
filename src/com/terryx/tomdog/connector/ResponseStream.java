@@ -106,7 +106,7 @@ public class ResponseStream extends ServletOutputStream {
     public void close() throws IOException {
         if (closed)
             throw new IOException("responseStream.close.closed");
-        ((ResponseBase)response).flushBuffer();
+        ((ResponseBase) response).flushBuffer();
         closed = true;
     }
 
@@ -120,7 +120,7 @@ public class ResponseStream extends ServletOutputStream {
             throw new IOException("responseStream.flush.closed");
         if (commit) {
             // When ResponseWriter call flush(). Finally, OldHttpResponse will flush its buffer called by ResponseStream.
-            ((ResponseBase)response).flushBuffer();
+            ((ResponseBase) response).flushBuffer();
         }
 
     }
@@ -140,7 +140,7 @@ public class ResponseStream extends ServletOutputStream {
         if ((length > 0) && (count >= length))
             throw new IOException("responseStream.write.count");
 
-        ((ResponseBase)response).write(b);
+        ((ResponseBase) response).write(b);
         count++;
 
     }
@@ -159,7 +159,7 @@ public class ResponseStream extends ServletOutputStream {
         int actual = len;
         if ((length > 0) && ((count + len) >= length))
             actual = length - count;
-        ((ResponseBase)response).write(b, off, actual);
+        ((ResponseBase) response).write(b, off, actual);
         count += actual;
         if (actual < len)
             throw new IOException("responseStream.write.count");

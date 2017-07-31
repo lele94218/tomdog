@@ -3,6 +3,7 @@ package com.terryx.tomdog.connector;
 import com.terryx.tomdog.HttpResponse;
 import org.apache.catalina.util.CookieTools;
 
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -73,6 +74,15 @@ public class HttpResponseBase
      */
     protected static final TimeZone zone = TimeZone.getTimeZone("GMT");
 
+    /**
+     * Return the <code>ServletResponse</code> for which this object
+     * is the facade.
+     */
+    public ServletResponse getResponse() {
+
+        return (facade);
+
+    }
 
     @Override
     public Cookie[] getCookies() {
@@ -101,7 +111,7 @@ public class HttpResponseBase
 
     @Override
     public int getStatus() {
-        return 0;
+        return this.status;
     }
 
     @Override
@@ -174,8 +184,72 @@ public class HttpResponseBase
 
     }
 
+    /**
+     * Set the specified header to the specified value.
+     *
+     * @param name  Name of the header to set
+     * @param value Value to be set
+     */
     @Override
-    public void setHeader(String s, String s1) {
+    public void setHeader(String name, String value) {
+        if (isCommitted())
+            return;
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        ArrayList values = new ArrayList();
+        values.add(value);
+        synchronized (headers) {
+            headers.put(name, values);
+        }
+
+        String match = name.toLowerCase();
+        if (match.equals("content-length")) {
+            int contentLength = -1;
+            try {
+                contentLength = Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                ;
+            }
+            if (contentLength >= 0)
+                setContentLength(contentLength);
+        } else if (match.equals("content-type")) {
+            setContentType(value);
+        }
+    }
+
+    /**
+     * Set the content length (in bytes) for this Response.
+     *
+     * @param length The new content length
+     */
+    public void setContentLength(int length) {
+
+        if (isCommitted())
+            return;
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        super.setContentLength(length);
+
+    }
+
+    /**
+     * Set the content type for this Response.
+     *
+     * @param type The new content type
+     */
+    public void setContentType(String type) {
+
+        if (isCommitted())
+            return;
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        super.setContentType(type);
 
     }
 
@@ -197,6 +271,11 @@ public class HttpResponseBase
     @Override
     public void setStatus(int i) {
 
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        this.status = status;
+        this.message = message;
     }
 
     @Override

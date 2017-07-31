@@ -8,6 +8,7 @@ import com.terryx.tomdog.util.StringManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -79,6 +80,17 @@ public class HttpProcessor implements Runnable {
 
 
     /**
+     * Ack string when pipelining HTTP requests.
+     */
+    private static final byte[] ack =
+            (new String("HTTP/1.1 100 Continue\r\n\r\n")).getBytes();
+
+    /**
+     * Processor state
+     */
+    private int status = Constants.PROCESSOR_IDLE;
+
+    /**
      * True if the client has asked to recieve a request acknoledgement. If so
      * the server will send a preliminary 100 Continue response just after it
      * has successfully parsed the request headers, and before starting
@@ -140,26 +152,37 @@ public class HttpProcessor implements Runnable {
                         ("Server", SERVER_INFO);
             } catch (Exception e) {
 //                log("process.create", e);
+                e.printStackTrace();
                 ok = false;
             }
 
             // Parse the incoming request
             try {
                 if (ok) {
-//                    parseConnection(socket);
+                    parseConnection(socket);
                     parseRequest(input, output);
+
+                    System.out.println("ok!");
                     if (!request.getRequest().getProtocol()
-                            .startsWith("HTTP/0"))
+                            .startsWith("HTTP/0")) {
                         parseHeaders(input);
+                    }
+
                     if (http11) {
                         // Sending a request acknowledge back to the client if
                         // requested.
-//                        ackRequest(output);
+                        ackRequest(output);
                         // If the protocol is HTTP/1.1, chunking is allowed.
 //                        if (connector.isChunkingAllowed())
 //                            response.setAllowChunking(true);
                     }
                 }
+
+            } catch (EOFException e) {
+                // It's very likely to be a socket disconnect on either the
+                // client or the server
+                ok = false;
+                finishResponse = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -176,18 +199,66 @@ public class HttpProcessor implements Runnable {
                 e.printStackTrace();
             }
 
-            try {
-//                shutdownInput(input);
-                socket.close();
-            } catch (IOException e) {
-                ;
-            } catch (Throwable e) {
-//                log("process.invoke", e);
+            // Finish up the handling of the request
+            if (finishResponse) {
+                try {
+                    response.finishResponse();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ok = false;
+                } catch (Throwable e) {
+//                    log("process.invoke", e);
+                    e.printStackTrace();
+                    ok = false;
+                }
+
+                try {
+                    request.finishRequest();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ok = false;
+                } catch (Throwable e) {
+//                    log("process.invoke", e);
+                    e.printStackTrace();
+                    ok = false;
+                }
+
+                try {
+                    if (output != null)
+                        output.flush();
+                } catch (IOException e) {
+                    ok = false;
+                }
             }
-            socket = null;
+
+            // We have to check if the connection closure has been requested
+            // by the application or the response stream (in case of HTTP/1.0
+            // and keep-alive).
+            if ("close".equals(response.getHeader("Connection"))) {
+                keepAlive = false;
+            }
 
 //            System.out.println("Ok---");
+            // End of request processing
+            status = Constants.PROCESSOR_IDLE;
+
+            // Recycling the request and the response objects
+            request.recycle();
+            response.recycle();
+
+            System.out.println("finish!!!" + stopped + " " + keepAlive + " " + ok);
         }
+
+        try {
+//                shutdownInput(input);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
+//                log("process.invoke", e);
+        }
+        socket = null;
 
 
 //        SocketInputStream input = null;
@@ -222,6 +293,28 @@ public class HttpProcessor implements Runnable {
     }
 
     /**
+     * Parse and record the connection parameters related to this request.
+     *
+     * @param socket The socket on which we are connected
+     * @throws IOException      if an input/output error occurs
+     * @throws ServletException if a parsing error occurs
+     */
+    private void parseConnection(Socket socket)
+            throws IOException, ServletException {
+
+//        if (debug >= 2)
+//            log("  parseConnection: address=" + socket.getInetAddress() +
+//                    ", port=" + connector.getPort());
+//        ((HttpRequestImpl) request).setInet(socket.getInetAddress());
+//        if (proxyPort != 0)
+//            request.setServerPort(proxyPort);
+//        else
+//            request.setServerPort(serverPort);
+        request.setSocket(socket);
+
+    }
+
+    /**
      * Parse the incoming HTTP request and set the corresponding HTTP request
      * properties.
      *
@@ -232,6 +325,13 @@ public class HttpProcessor implements Runnable {
      */
     private void parseRequest(SocketInputStream input, OutputStream output) throws IOException, ServletException {
         input.readRequestLine(requestLine);
+
+
+        // When the previous method returns, we're actually processing a
+        // request
+        status = Constants.PROCESSOR_ACTIVE;
+
+
         String method = new String(requestLine.method, 0, requestLine.methodEnd);
         String uri = null;
         String protocol = new String(requestLine.protocol, 0, requestLine.protocolEnd);
@@ -241,7 +341,7 @@ public class HttpProcessor implements Runnable {
 
         // Now check if the connection should be kept alive after parsing the
         // request.
-        if ( protocol.equals("HTTP/1.1") ) {
+        if (protocol.equals("HTTP/1.1")) {
             http11 = true;
             sendAck = false;
         } else {
@@ -321,6 +421,18 @@ public class HttpProcessor implements Runnable {
             throw new ServletException("Invalid URI '" + uri + "'");
         }
 
+    }
+
+    /**
+     * Send a confirmation that a request has been processed when pipelining.
+     * HTTP/1.1 100 Continue is sent back to the client.
+     *
+     * @param output Socket output stream
+     */
+    private void ackRequest(OutputStream output)
+            throws IOException {
+        if (sendAck)
+            output.write(ack);
     }
 
     /**
@@ -453,6 +565,12 @@ public class HttpProcessor implements Runnable {
                 }
             } else if ("content-type".equals(name)) {
                 request.setContentType(name);
+            } else if (header.equals(DefaultHeaders.CONNECTION_NAME)) {
+                if (header.valueEquals
+                        (DefaultHeaders.CONNECTION_CLOSE_VALUE)) {
+                    keepAlive = false;
+                    response.setHeader("Connection", "close");
+                }
             }
         }
 
@@ -477,6 +595,7 @@ public class HttpProcessor implements Runnable {
                 process(socket);
             } catch (Throwable t) {
 //                log("process.invoke", t);
+                t.printStackTrace();
             }
 
             // Finish up this request

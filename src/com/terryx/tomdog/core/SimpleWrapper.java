@@ -305,6 +305,7 @@ public class SimpleWrapper implements Wrapper, Pipeline {
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
+//        System.out.println("invoke");
         pipeline.invoke(request, response);
     }
 
