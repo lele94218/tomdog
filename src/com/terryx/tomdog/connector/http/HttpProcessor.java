@@ -162,7 +162,6 @@ public class HttpProcessor implements Runnable {
                     parseConnection(socket);
                     parseRequest(input, output);
 
-                    System.out.println("ok!");
                     if (!request.getRequest().getProtocol()
                             .startsWith("HTTP/0")) {
                         parseHeaders(input);
@@ -181,11 +180,14 @@ public class HttpProcessor implements Runnable {
             } catch (EOFException e) {
                 // It's very likely to be a socket disconnect on either the
                 // client or the server
+//                e.printStackTrace();
                 ok = false;
                 finishResponse = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+
 
 
             // Ask our Container to process this request
@@ -246,7 +248,6 @@ public class HttpProcessor implements Runnable {
             request.recycle();
             response.recycle();
 
-            System.out.println("finish!!!" + stopped + " " + keepAlive + " " + ok);
         }
 
         try {

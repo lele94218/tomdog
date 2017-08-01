@@ -18,11 +18,12 @@ public class ModernServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.println("--------DOGET--------");
+//        try {
+//            Thread.sleep(500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
         out.println("<html>");

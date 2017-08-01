@@ -421,6 +421,7 @@ public class HttpResponseBase
             outputWriter.print("Content-Type: " + getContentType() + "\r\n");
         }
         if (getContentLength() >= 0) {
+            System.out.println(getContentLength() + "-----------");
             outputWriter.print("Content-Length: " + getContentLength() + "\r\n");
         }
         // Send all specified headers (if any)

@@ -47,14 +47,14 @@ public class SimpleWrapperValve implements Valve, Contained {
         // Allocate a servlet instance to process this request
         try {
             servlet = wrapper.allocate();
-            if (hres!=null && hreq!=null) {
+            if (hres != null && hreq != null) {
+                System.out.println("servicing..");
                 servlet.service(hreq, hres);
-            }
-            else {
+            } else {
                 servlet.service(sreq, sres);
             }
-        }
-        catch (ServletException e) {
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
     }
 }

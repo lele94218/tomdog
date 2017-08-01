@@ -71,6 +71,12 @@ public class ResponseStream extends ServletOutputStream {
     protected OutputStream stream = null;
 
 
+    /**
+     * Has this response output been suspended?
+     */
+    protected boolean suspended = false;
+
+
     // ------------------------------------------------------------- Properties
 
 
