@@ -1,5 +1,6 @@
 package com.terryx.tomdog.connector;
 
+import com.terryx.tomdog.Context;
 import com.terryx.tomdog.HttpResponse;
 import org.apache.catalina.util.CookieTools;
 
@@ -73,6 +74,7 @@ public class HttpResponseBase
      * The time zone with which to construct date headers.
      */
     protected static final TimeZone zone = TimeZone.getTimeZone("GMT");
+
 
     /**
      * Return the <code>ServletResponse</code> for which this object
@@ -159,13 +161,50 @@ public class HttpResponseBase
         return null;
     }
 
-    @Override
-    public void sendError(int i, String s) throws IOException {
+    /**
+     * Send an error response with the specified status and message.
+     *
+     * @param status  HTTP status code to send
+     * @param message Corresponding message to send
+     * @throws IllegalStateException if this response has
+     *                               already been committed
+     * @throws IOException           if an input/output error occurs
+     */
+    public void sendError(int status, String message) throws IOException {
+
+        if (isCommitted())
+            throw new IllegalStateException
+                    (sm.getString("httpResponseBase.sendError.ise"));
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        setError();
+
+        // Record the status code and message.
+        this.status = status;
+        this.message = message;
+
+        // Clear any data content that has been buffered
+        resetBuffer();
+
+        // Cause the response to be finished (from the application perspective)
+        setSuspended(true);
 
     }
 
-    @Override
-    public void sendError(int i) throws IOException {
+    /**
+     * Send an error response with the specified status and a
+     * default message.
+     *
+     * @param status HTTP status code to send
+     * @throws IllegalStateException if this response has
+     *                               already been committed
+     * @throws IOException           if an input/output error occurs
+     */
+    public void sendError(int status) throws IOException {
+
+        sendError(status, getStatusMessage(status));
 
     }
 

@@ -304,15 +304,15 @@ public interface Container {
 //    public void addContainerListener(ContainerListener listener);
 //
 //
-//    /**
-//     * Add the specified Mapper associated with this Container.
-//     *
-//     * @param mapper The corresponding Mapper implementation
-//     *
-//     * @exception IllegalArgumentException if this exception is thrown by
-//     *  the <code>setContainer()</code> method of the Mapper
-//     */
-//    public void addMapper(Mapper mapper);
+    /**
+     * Add the specified Mapper associated with this Container.
+     *
+     * @param mapper The corresponding Mapper implementation
+     *
+     * @exception IllegalArgumentException if this exception is thrown by
+     *  the <code>setContainer()</code> method of the Mapper
+     */
+    public void addMapper(Mapper mapper);
 
 
     /**
@@ -347,21 +347,21 @@ public interface Container {
 //    public ContainerListener[] findContainerListeners();
 //
 //
-//    /**
-//     * Return the Mapper associated with the specified protocol, if there
-//     * is one.  If there is only one defined Mapper, use it for all protocols.
-//     * If there is no matching Mapper, return <code>null</code>.
-//     *
-//     * @param protocol Protocol for which to find a Mapper
-//     */
-//    public Mapper findMapper(String protocol);
-//
-//
-//    /**
-//     * Return the set of Mappers associated with this Container.  If this
-//     * Container has no Mappers, a zero-length array is returned.
-//     */
-//    public Mapper[] findMappers();
+    /**
+     * Return the Mapper associated with the specified protocol, if there
+     * is one.  If there is only one defined Mapper, use it for all protocols.
+     * If there is no matching Mapper, return <code>null</code>.
+     *
+     * @param protocol Protocol for which to find a Mapper
+     */
+    public Mapper findMapper(String protocol);
+
+
+    /**
+     * Return the set of Mappers associated with this Container.  If this
+     * Container has no Mappers, a zero-length array is returned.
+     */
+    public Mapper[] findMappers();
 
 
     /**

@@ -289,6 +289,11 @@ public class SimpleWrapper implements Wrapper, Pipeline {
     }
 
     @Override
+    public void addMapper(Mapper mapper) {
+
+    }
+
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
 
     }
@@ -301,6 +306,16 @@ public class SimpleWrapper implements Wrapper, Pipeline {
     @Override
     public Container[] findChildren() {
         return new Container[0];
+    }
+
+    @Override
+    public Mapper findMapper(String protocol) {
+        return null;
+    }
+
+    @Override
+    public Mapper[] findMappers() {
+        return new Mapper[0];
     }
 
     @Override

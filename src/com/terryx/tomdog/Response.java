@@ -21,19 +21,19 @@ public interface Response {
 
     // ------------------------------------------------------------- Properties
 
-//
-//    /**
-//     * Return the Connector through which this Response is returned.
-//     */
-//    public Connector getConnector();
-//
-//
-//    /**
-//     * Set the Connector through which this Response is returned.
-//     *
-//     * @param connector The new connector
-//     */
-//    public void setConnector(Connector connector);
+
+    /**
+     * Return the Connector through which this Response is returned.
+     */
+    public Connector getConnector();
+
+
+    /**
+     * Set the Connector through which this Response is returned.
+     *
+     * @param connector The new connector
+     */
+    public void setConnector(Connector connector);
 
 
     /**
@@ -41,20 +41,20 @@ public interface Response {
      */
     public int getContentCount();
 
-//
-//    /**
-//     * Return the Context with which this Response is associated.
-//     */
-//    public Context getContext();
-//
-//
-//    /**
-//     * Set the Context with which this Response is associated.  This should
-//     * be called as soon as the appropriate Context is identified.
-//     *
-//     * @param context The associated Context
-//     */
-//    public void setContext(Context context);
+
+    /**
+     * Return the Context with which this Response is associated.
+     */
+    public Context getContext();
+
+
+    /**
+     * Set the Context with which this Response is associated.  This should
+     * be called as soon as the appropriate Context is identified.
+     *
+     * @param context The associated Context
+     */
+    public void setContext(Context context);
 
 
     /**

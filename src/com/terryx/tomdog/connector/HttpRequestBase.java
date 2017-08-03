@@ -280,7 +280,11 @@ public class HttpRequestBase extends RequestBase implements HttpRequest, HttpSer
 
     @Override
     public String getDecodedRequestURI() {
-        return null;
+
+        if (decodedRequestURI == null)
+            decodedRequestURI = RequestUtil.URLDecode(getRequestURI());
+
+        return decodedRequestURI;
     }
 
     @Override

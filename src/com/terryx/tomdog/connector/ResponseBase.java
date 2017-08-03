@@ -1,6 +1,7 @@
 package com.terryx.tomdog.connector;
 
 import com.terryx.tomdog.Connector;
+import com.terryx.tomdog.Context;
 import com.terryx.tomdog.Request;
 import com.terryx.tomdog.Response;
 import com.terryx.tomdog.util.RequestUtil;
@@ -81,10 +82,10 @@ public abstract class ResponseBase
     protected String contentType = null;
 
 
-//    /**
-//     * The Context within which this Response is being produced.
-//     */
-//    protected Context context = null;
+    /**
+     * The Context within which this Response is being produced.
+     */
+    protected Context context = null;
 
 
     /**
@@ -218,27 +219,27 @@ public abstract class ResponseBase
     }
 
 
-//    /**
-//     * Return the Context with which this Response is associated.
-//     */
-//    public Context getContext() {
-//
-//        return (this.context);
-//
-//    }
+    /**
+     * Return the Context with which this Response is associated.
+     */
+    public Context getContext() {
+
+        return (this.context);
+
+    }
 
 
-//    /**
-//     * Set the Context with which this Response is associated.  This should
-//     * be called as soon as the appropriate Context is identified.
-//     *
-//     * @param context The associated Context
-//     */
-//    public void setContext(Context context) {
-//
-//        this.context = context;
-//
-//    }
+    /**
+     * Set the Context with which this Response is associated.  This should
+     * be called as soon as the appropriate Context is identified.
+     *
+     * @param context The associated Context
+     */
+    public void setContext(Context context) {
+
+        this.context = context;
+
+    }
 
 
     /**
