@@ -53,6 +53,7 @@ public class SimpleContextValve implements Valve, Contained {
             return;
         }
 
+
         Context context = (Context) getContainer();
 
         // Select the Wrapper to be used for this Request
@@ -64,6 +65,7 @@ public class SimpleContextValve implements Valve, Contained {
             return;
         }
         if (wrapper == null) {
+
             notFound((HttpServletResponse) response.getResponse());
             return;
         }

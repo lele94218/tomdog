@@ -15,7 +15,8 @@ import java.io.IOException;
  * @author taoranxue on 7/9/17 9:11 PM.
  */
 public class Bootstrap {
-    public static final String[] strs = new String[]{"        ,----,                                                               ",
+    public static final String[] strs = new String[]{
+            "        ,----,                                                               ",
             "      ,/   .`| ,----..            ____                 ,----..               ",
             "    ,`   .'  :/   /   \\         ,'  , `.   ,---,      /   /   \\   ,----..    ",
             "  ;    ;     /   .     :     ,-+-,.' _ | .'  .' `\\   /   .     : /   /   \\   ",
@@ -38,9 +39,8 @@ public class Bootstrap {
             System.out.println(len);
         }
 //        HttpConnector connector = new HttpConnector();
-////        connector.start();
 //        Wrapper wrapper = new SimpleWrapper();
-//        wrapper.setServletClass("ModernServlet");
+//        wrapper.setServletClass("PrimitiveServlet");
 //        Loader loader = new SimpleLoader();
 //        Valve valve1 = new HeaderLoggerValve();
 //        Valve valve2 = new ClientIPLoggerValve();
@@ -58,15 +58,15 @@ public class Bootstrap {
 //        }
 
         HttpConnector connector = new HttpConnector();
-//        Wrapper wrapper1 = new SimpleWrapper();
-//        wrapper1.setName("Primitive");
-//        wrapper1.setServletClass("PrimitiveServlet");
+        Wrapper wrapper1 = new SimpleWrapper();
+        wrapper1.setName("Primitive");
+        wrapper1.setServletClass("PrimitiveServlet");
         Wrapper wrapper2 = new SimpleWrapper();
         wrapper2.setName("Modern");
         wrapper2.setServletClass("ModernServlet");
 
         Context context = new SimpleContext();
-//        context.addChild(wrapper1);
+        context.addChild(wrapper1);
         context.addChild(wrapper2);
 
         Valve valve1 = new HeaderLoggerValve();
@@ -78,9 +78,10 @@ public class Bootstrap {
         Mapper mapper = new SimpleContextMapper();
         mapper.setProtocol("http");
         context.addMapper(mapper);
+
         Loader loader = new SimpleLoader();
         context.setLoader(loader);
-        // context.addServletMapping(pattern, name);
+
         context.addServletMapping("/Primitive", "Primitive");
         context.addServletMapping("/Modern", "Modern");
         connector.setContainer(context);

@@ -20,14 +20,9 @@ public class PrimitiveServlet implements Servlet {
     public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         System.out.println("from service");
         PrintWriter out = response.getWriter();
-        String errorMessage = "HTTP/1.1 404 File Not Found\r\n" +
-                "Content-Type: text/html\r\n" +
-                "Content-Length: 23\r\n" +
-                "\r\n" +
-                "<h1>File Nat Found</h1>";
+        response.setContentType("text/html");
+        String errorMessage = "<h1>This is Primitive Servlet</h1>";
         out.print(errorMessage);
-//        out.println("hello!!!!!");
-//        out.print("not output this line!!!");
     }
 
     @Override

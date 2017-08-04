@@ -81,6 +81,11 @@ public final class HttpConnector implements Connector, Runnable {
      */
     private int bufferSize = 2048;
 
+    /**
+     * The "enable DNS lookups" flag for this Connector.
+     */
+    private boolean enableLookups = false;
+
     private boolean shutdown = false;
     private String scheme = "http";
 
@@ -203,13 +208,24 @@ public final class HttpConnector implements Connector, Runnable {
         this.container = container;
     }
 
+    /**
+     * Return the "enable DNS lookups" flag.
+     */
     @Override
     public boolean getEnableLookups() {
-        return false;
+        return (this.enableLookups);
     }
 
+
+    /**
+     * Set the "enable DNS lookups" flag.
+     *
+     * @param enableLookups The new "enable DNS lookups" flag value
+     */
     @Override
     public void setEnableLookups(boolean enableLookups) {
+
+        this.enableLookups = enableLookups;
 
     }
 

@@ -1,7 +1,5 @@
 package com.terryx.tomdog.connector.http;
 
-import com.terryx.tomdog.ServletProcessor;
-import com.terryx.tomdog.StaticResourceProcessor;
 import com.terryx.tomdog.util.RequestUtil;
 import com.terryx.tomdog.util.StringManager;
 
@@ -306,7 +304,7 @@ public class HttpProcessor implements Runnable {
 //        if (debug >= 2)
 //            log("  parseConnection: address=" + socket.getInetAddress() +
 //                    ", port=" + connector.getPort());
-//        ((HttpRequestImpl) request).setInet(socket.getInetAddress());
+        ((HttpRequestImpl) request).setInet(socket.getInetAddress());
 //        if (proxyPort != 0)
 //            request.setServerPort(proxyPort);
 //        else

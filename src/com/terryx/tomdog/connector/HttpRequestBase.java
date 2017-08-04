@@ -538,4 +538,35 @@ public class HttpRequestBase extends RequestBase implements HttpRequest, HttpSer
         parsed = true;
         parameters = results;
     }
+
+    /**
+     * Release all object references, and initialize instance variables, in
+     * preparation for reuse of this object.
+     */
+    public void recycle() {
+
+        super.recycle();
+        authType = null;
+        contextPath = "";
+        cookies.clear();
+        headers.clear();
+        method = null;
+        if (parameters != null) {
+            parameters.setLocked(false);
+            parameters.clear();
+        }
+        parsed = false;
+        pathInfo = null;
+        queryString = null;
+        requestedSessionCookie = false;
+        requestedSessionId = null;
+        requestedSessionURL = false;
+        requestURI = null;
+        decodedRequestURI = null;
+        secure = false;
+        servletPath = null;
+//        session = null;
+        userPrincipal = null;
+
+    }
 }
